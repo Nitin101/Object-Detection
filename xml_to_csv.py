@@ -1,7 +1,7 @@
 import csv
 import os
 import xml.etree.cElementTree as et
-
+import SSD.data_resize as dr
 path = "VOCdevkit\VOC2007\Annotations/"
 dirs = os.listdir(path)
 dic= {
@@ -12,6 +12,14 @@ dic= {
 xml_data_to_csv = open('voc07_train.csv', 'w')
 c = 0
 count = 0
+i = 0
+
+obj_bound_list = dr.redo_bound()
+
+Csv_writer = csv.writer(xml_data_to_csv)
+list_head = ['image_name','class','class_id','xmin','ymin','xmax','ymax']
+Csv_writer.writerow(list_head)
+
 for item in dirs:
 
     if os.path.isfile(path + item):
@@ -24,8 +32,6 @@ for item in dirs:
         root = tree.getroot()
 
         list_head = []
-
-        Csv_writer=csv.writer(xml_data_to_csv)
 
 
         for element in root.findall('object'):
@@ -41,18 +47,18 @@ for item in dirs:
 
                 list_nodes.append(dic[name])
 
-                xmin = element[4][0].text
+                xmin = (int)(obj_bound_list[i][0])
                 list_nodes.append(xmin)
 
 
-                ymin = element[4][1].text
+                ymin = (int)(obj_bound_list[i][1])
                 list_nodes.append(ymin)
 
 
-                xmax = element[4][2].text
+                xmax = (int)(obj_bound_list[i][2])
                 list_nodes.append(xmax)
 
-                ymax = element[4][3].text
+                ymax = (int)(obj_bound_list[i][3])
                 list_nodes.append(ymax)
 
             except:
@@ -67,16 +73,16 @@ for item in dirs:
 
                     list_nodes.append(dic[name])
 
-                    xmin = part[1][0].text
+                    xmin = (int)(obj_bound_list[i][0])
                     list_nodes.append(xmin)
 
-                    ymin = part[1][1].text
+                    ymin = (int)(obj_bound_list[i][1])
                     list_nodes.append(ymin)
 
-                    xmax = part[1][2].text
+                    xmax = (int)(obj_bound_list[i][2])
                     list_nodes.append(xmax)
 
-                    ymax = part[1][3].text
+                    ymax = (int)(obj_bound_list[i][3])
                     list_nodes.append(ymax)
 
                     if (len(list_nodes) > 0):
@@ -84,6 +90,7 @@ for item in dirs:
 
                     list_nodes = []
 
+            i+=1
             #Write List_nodes to csv
             if(len(list_nodes)>0):
                 Csv_writer.writerow(list_nodes)
