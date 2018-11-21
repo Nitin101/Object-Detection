@@ -471,7 +471,6 @@ def build_model(image_size,
 
     if mode == 'training':
         model = Model(inputs=x, outputs=predictions)
-
     elif mode == 'inference':
         decoded_predictions = DecodeDetections(confidence_thresh=confidence_thresh,
                                                iou_threshold=iou_threshold,
@@ -496,8 +495,6 @@ def build_model(image_size,
         model = Model(inputs=x, outputs=decoded_predictions)
     else:
         raise ValueError("`mode` must be one of 'training', 'inference' or 'inference_fast', but received '{}'.".format(mode))
-
-    model.summary()
 
     if return_predictor_sizes:
         # The spatial dimensions are the same for the `classes` and `boxes` predictor layers.

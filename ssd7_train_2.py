@@ -9,7 +9,7 @@ from math import ceil
 import numpy as np
 from matplotlib import pyplot as plt
 
-from ssd7 import build_model
+from ssd7_2 import build_model
 from keras_loss_function.keras_ssd_loss import SSDLoss
 from keras_layers.keras_layer_AnchorBoxes import AnchorBoxes
 from keras_layers.keras_layer_DecodeDetections import DecodeDetections
@@ -62,7 +62,7 @@ model = build_model(image_size=(img_height, img_width, img_channels),
 
 # 2: Optional: Load some weights
 
-model.load_weights('./ssd7_weights.h5', by_name=True)
+model.load_weights('./ssd7_weights_2.h5', by_name=True)
 
 # 3: Instantiate an Adam optimizer and the SSD loss function and compile the model
 
@@ -70,7 +70,7 @@ adam = Adam(lr=0.001, beta_1=0.9, beta_2=0.999, epsilon=1e-08, decay=0.0)
 
 ssd_loss = SSDLoss(neg_pos_ratio=3, alpha=1.0)
 
-model.compile(optimizer=adam, loss=ssd_loss.compute_loss)
+model.compile(optimizer=adam, loss=ssd_loss.compute_loss, metrics = ['accuracy'])
 
 
 # 1: Instantiate two `DataGenerator` objects: One for training, one for validation.
@@ -192,7 +192,7 @@ val_generator = val_dataset.generate(batch_size=batch_size,
 # Define model callbacks.
 
 # TODO: Set the filepath under which you want to save the weights.
-model_checkpoint = ModelCheckpoint(filepath='ssd7_weights.h5',
+model_checkpoint = ModelCheckpoint(filepath='ssd7_weights_2.h5',
                                    monitor='val_loss',
                                    verbose=1,
                                    save_best_only=True,
@@ -200,7 +200,7 @@ model_checkpoint = ModelCheckpoint(filepath='ssd7_weights.h5',
                                    mode='auto',
                                    period=1)
 
-csv_logger = CSVLogger(filename='ssd7_training_log.csv',
+csv_logger = CSVLogger(filename='ssd7_training_log_2.csv',
                        separator=',',
                        append=True)
 
@@ -227,8 +227,8 @@ callbacks = [model_checkpoint,
 # TODO: Set the epochs to train for.
 # If you're resuming a previous training, set `initial_epoch` and `final_epoch` accordingly.
 initial_epoch   = 0
-final_epoch     = 1
-steps_per_epoch = 10
+final_epoch     = 20
+steps_per_epoch = 1000
 
 history = model.fit_generator(generator=train_generator,
                               steps_per_epoch=steps_per_epoch,
@@ -282,7 +282,6 @@ plt.imshow(batch_images[i])
 current_axis = plt.gca()
 
 colors = plt.cm.hsv(np.linspace(0, 1, n_classes+1)).tolist() # Set the colors for the bounding boxes
-
 classes = [
     "aeroplane", "bicycle", "bird", "boat", "bottle", "bus", "car", "cat",
     "chair", "cow", "diningtable", "dog", "horse", "motorbike", "person",
@@ -308,3 +307,5 @@ for box in y_pred_decoded[i]:
     label = '{}: {:.2f}'.format(classes[int(box[0])], box[1])
     current_axis.add_patch(plt.Rectangle((xmin, ymin), xmax-xmin, ymax-ymin, color=color, fill=False, linewidth=2))
     current_axis.text(xmin, ymin, label, size='x-large', color='white', bbox={'facecolor':color, 'alpha':1.0})
+
+plt.show()
